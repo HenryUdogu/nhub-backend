@@ -53,7 +53,12 @@ router.post("/", (req,res) => {
         });
     }
     const users = getUser();
-    const newUser = {name,age,email};
+    const newUser = {
+        id:Date.now(),
+
+
+        ...req.body
+    };
 
     //push new users  to users array and save to file
     users.push(newUser);
@@ -66,4 +71,57 @@ router.post("/", (req,res) => {
     });
 });
 //this is use to export the router to be used in other files such as sever.js
+
+//update users
+router.patch("/:id",(req,res) => {
+    //get user from file
+    const users = getUsers();
+    //get user with id
+    const id = Number(req.params.id);
+    //find user with id
+    const userIndex = users.findIndex(user => user.id === id);
+
+    //check if user does not exist
+    if (userIndex === -1) {
+        return res.json({
+            message: "User not found "
+        });
+    };
+    //update user data
+    users[userIndex] = {
+        //keep existing data and update with new data from request body
+        ...users[userIndex],
+        //return all data from request body and overwrite existing data with same keys
+        ...req.body
+    };
+    //save updated users to file
+    saveUser(users);
+    res.json({
+        mesage: "Updated ssuccessfully",
+        user: users[userIndex]
+    });
+
+});
+//delete user
+router.delete("/:id",(req,res) => {
+    const users = getUsers();
+    const id = Number(req.params.id);
+
+    const userIndex = users.findIndex(user => this.use.id === id);
+
+    if(userIndex === -1) {
+        return res.json({
+            message: "user not found"
+        });
+    }
+    //remove user from array
+    const deletedUser = users.splice(userIndex, 1)[0];
+
+    saveUsers(users);
+
+    res.json({
+        message: "User deleted successfully",
+        data: "deleted user"
+    });
+});
 module.exports = router;
